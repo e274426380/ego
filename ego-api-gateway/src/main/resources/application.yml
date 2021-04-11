@@ -1,0 +1,50 @@
+server:
+  port: 10010
+spring:
+  application:
+    name: EgoApiGateway
+  cloud:
+    nacos:
+      discovery:
+        server‐addr: 127.0.0.1:8848
+    gateway:
+#      globalcors:
+#        cors-configurations:
+#          '[/**]': # 匹配所有请求
+#            allowedOrigins: "http://manage.ego.com,http://www.ego.com"  #跨域处理 允许指定的域
+#            allowedMethods: # 支持的方法
+#              - GET
+#              - OPTIONS
+#              - POST
+      routes:
+        - id: item_route
+          uri: lb://ItemService  #必须和nacos中注册的名字一样
+          predicates:
+            - Path=/api/item/**
+          filters:
+            - StripPrefix=2  #去除/api/item路径
+        - id: search_route
+          uri: lb://SearchService  #必须和nacos中注册的名字一样
+          predicates:
+            - Path=/api/search/**
+          filters:
+            - StripPrefix=2  #去除/api/search路径
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 1000 # 设置hystrix的超时时间为6000ms
+management:
+  endpoint:
+    gateway:
+      enabled: true
+    web:
+      exposure:
+        include: true
+logging:
+  level:
+    root: info
+    org:
+      springframework: error

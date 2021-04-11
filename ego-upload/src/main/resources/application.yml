@@ -1,0 +1,26 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: UploadService
+  cloud:
+    nacos:
+      discovery:
+        server‐addr: 127.0.0.1:8848
+  servlet:
+    multipart:
+      max-file-size: 1024MB # 限制文件上传的大小
+      max-request-size: 1024MB  #设置单次请求文件的总大小
+logging:
+  level:
+    root: error
+    com:
+      ego: debug
+fdfs:
+  so-timeout: 1501
+  connect-timeout: 601
+  thumb-image: # 缩略图
+    width: 60
+    height: 60
+  tracker-list: # tracker地址
+    - 192.168.249.10:22122

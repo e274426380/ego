@@ -1,0 +1,22 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: GoodsWeb
+  thymeleaf:
+    cache: false
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      discovery:
+        server‐addr: 127.0.0.1:8848
+logging:
+  level:
+    root: error
+    com.ego: debug
+  file:
+    name: d://logs/goods-web.log
+  pattern:
+    #控制台日志输出格式配置，仅对控制台有效
+    console: "%date %-5level %logger{0} - %message%n"

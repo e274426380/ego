@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ego.item.mapper.SpuMapper">
+<resultMap id="SpuBOMap" type="com.ego.entity.SpuBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="brand_id" jdbcType="INTEGER" property="brandId" />
+    <id column="cid1" jdbcType="INTEGER" property="cid1" />
+    <id column="cid2" jdbcType="INTEGER" property="cid2" />
+    <id column="cid3" jdbcType="INTEGER" property="cid3" />
+    <id column="title" jdbcType="VARCHAR" property="title" />
+    <id column="sub_title" jdbcType="VARCHAR" property="subTitle" />
+    <id column="saleable" jdbcType="INTEGER" property="saleable" />
+    <id column="valid" jdbcType="INTEGER" property="valid" />
+    <id column="create_time" jdbcType="DATE" property="createTime" />
+    <id column="last_update_time" jdbcType="DATE" property="lastUpdateTime" />
+    <id column="categoryNames" jdbcType="VARCHAR" property="categoryNames" />
+    <id column="brandName" jdbcType="VARCHAR" property="brandName" />
+</resultMap>
+    <resultMap id="spuBORM" type="com.ego.entity.SpuBO">
+        <id property="id" column="id"/>
+        <result property="brandId" column="brand_id"/>
+        <result property="cid1" column="cid1"/>
+        <result property="cid2" column="cid2"/>
+        <result property="cid3" column="cid3"/>
+        <result property="title" column="title"/>
+        <result property="subTitle" column="sub_title"/>
+        <result property="createTime" column="create_time"/>
+        <result property="categoryNames" column="category_names"/>
+        <result property="brandName" column="brand_name"/>
+        <association property="spuDetail" javaType="com.ego.entity.SpuDetail">
+            <id property="spuId" column="detail_spu_id"/>
+            <result property="specifications" column="specifications"/>
+        </association>
+        <collection property="skus" ofType="com.ego.entity.Sku">
+            <id  property="id" column="sku_id" />
+            <result property="spuId" column="spu_id"/>
+            <result property="title" column="sku_title"/>
+            <result property="price" column="price"/>
+            <result property="images" column="images"/>
+            <result property="enable" column="enable"/>
+        </collection>
+    </resultMap>
+    <resultMap id="spuRMForSpuBo" type="com.ego.entity.SpuBO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="saleable" property="saleable"/>
+        <result column="category_names" property="categoryNames"/>
+        <result column="brand_name" property="brandName"/>
+        <result column="cid1" property="cid1"/>
+        <result column="cid2" property="cid2"/>
+        <result column="cid3" property="cid3"/>
+        <result column="brand_id" property="brandId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="sub_title" property="subTitle"/>
+        <association property="spuDetail" javaType="com.ego.entity.SpuDetail">
+            <id property="spuId" column="spu_id"/>
+            <result property="specifications" column="specifications"/>
+            <result property="specTemplate" column="spec_template"/>
+            <result property="description" column="description"/>
+            <result property="packingList" column="packing_list"/>
+            <result property="afterService" column="after_service"/>
+        </association>
+        <collection property="skus"  ofType="com.ego.entity.Sku">
+            <id property="id" column="sku_id"/>
+            <result property="spuId" column="spu_id"/>
+            <result property="title" column="sku_title"/>
+            <result property="images" column="images"/>
+            <result property="price" column="price"/>
+            <result property="ownSpec" column="own_spec"/>
+            <result property="indexes" column="indexes"/>
+            <association property="stock" javaType="com.ego.entity.Stock">
+                <id property="skuId" column="sku_id"/>
+                <result property="stock" column="stock"/>
+            </association>
+        </collection>
+    </resultMap>
+    <!--<select id="selectSpuPage" resultMap="SpuBOMap">-->
+        <!--SELECT-->
+        <!--spu.id,spu.title,-->
+        <!--concat( c1.name, "/", c2.name, "/", c3.name ) category_names,-->
+        <!--brand.name bname-->
+        <!--FROM-->
+      		<!--(SELECT id,title,cid1,cid2,cid3,brand_id from tb_spu where title like '%${key}%' and saleable=#{saleable}-->
+      		<!--limit #{pageNo},#{rows})-->
+        <!--spu-->
+		<!--LEFT JOIN tb_brand brand ON spu.brand_id = brand.id-->
+        <!--LEFT JOIN tb_category c1 ON spu.cid1 = c1.id-->
+        <!--LEFT JOIN tb_category c2 ON spu.cid2 = c2.id-->
+        <!--LEFT JOIN tb_category c3 ON spu.cid3 = c3.id-->
+    <!--</select>-->
+
+    <select id="selectPageForES" resultMap="spuBORM">
+        SELECT
+        spu.*,
+        sku.id sku_id,sku.spu_id,sku.title sku_title,sku.images,sku.price,sku.enable,
+        detail.spu_id detail_spu_id, detail.specifications,
+        concat( c1.NAME, "/", c2.NAME, "/", c3.NAME ) category_names,
+        b.NAME brand_name
+        FROM
+        ( SELECT id,title,cid1,cid2,cid3,brand_id,create_time,sub_title FROM tb_spu
+        <where>
+            <if test="param1 != null">
+                saleable = #{param1}
+            </if>
+
+        </where>
+        LIMIT #{param2}, #{param3}
+        ) spu
+        LEFT JOIN tb_category c1 ON spu.cid1 = c1.id
+        LEFT JOIN tb_category c2 ON spu.cid2 = c2.id
+        LEFT JOIN tb_category c3 ON spu.cid3 = c3.id
+        LEFT JOIN tb_brand b ON spu.brand_id = b.id
+        LEFT JOIN tb_sku sku ON spu.id = sku.spu_id
+        LEFT JOIN tb_spu_detail detail ON spu.id = detail.spu_id
+    </select>
+    <select id="selectSpuPage" resultMap="SpuBOMap">
+     SELECT
+     spu.*,concat(c1.NAME,"/",c2.NAME,"/",c3.NAME) category_name,b.NAME brand_name
+     from(select id,title,cid1,cid2,cid3,brand_id from tb_spu
+     <where>
+     <if test="param2!=null">
+        saleable=#{param2}
+     </if>
+     <if test="param1!=null and param1!=''">
+        and title like = '%${param1}%'
+     </if>
+     </where>
+     LIMIT #{param3},#{param4}
+     ) spu
+     LEFT JOIN tb_category c1 on c1.id=spu.cid1
+     LEFT JOIN tb_category c2 on c2.id=spu.cid2
+     LEFT JOIN tb_category c3 on c3.id=spu.cid3
+     LEFT JOIN tb_brand b on b.id=spu.brand_id
+    </select>
+    <select id="selectSpuBoById" resultMap="spuRMForSpuBo" parameterType="object" >
+        SELECT
+        s.id,
+        s.title,
+        s.saleable,
+        s.cid1,
+        s.cid2,
+        s.cid3,
+        s.brand_id,
+        s.sub_title,
+        s.create_time,
+        sku.id sku_id,
+        sku.spu_id ,
+        sku.title sku_title,
+        sku.price,
+        sku.images,
+        sku.own_spec,
+        sku.indexes,
+        stock.stock,
+        detail.specifications,
+        detail.spec_template,
+        detail.description,
+        detail.packing_list,
+        detail.after_service
+        FROM
+        (
+            select * from tb_spu s where id=#{spuId}
+        ) s
+        JOIN tb_brand b ON s.brand_id = b.id
+        LEFT JOIN tb_sku sku  on sku.spu_id = s.id
+        LEFT JOIN tb_stock stock on sku.id = stock.sku_id
+        LEFT JOIN tb_spu_detail detail  on detail.spu_id = s.id
+    </select>
+</mapper>

@@ -1,0 +1,26 @@
+server:
+  port: 8083
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: SearchService
+  elasticsearch:
+    rest:
+      uris:
+        - http://192.168.249.10:9200
+  jackson:
+    default-property-inclusion: non_null # 配置json处理时忽略空值
+  cloud:
+    nacos:
+      discovery:
+        server‐addr: 127.0.0.1:8848
+logging:
+  level:
+    root: error
+    com.ego: debug
+  file:
+    name: d://logs/search.log
+  pattern:
+    #控制台日志输出格式配置，仅对控制台有效
+    console: "%date %-5level %logger{0} - %message%n"

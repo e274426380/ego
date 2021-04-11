@@ -1,0 +1,31 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: ItemService
+  datasource:
+    url: jdbc:mysql://localhost:3306/ego_item
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: root
+    hikari:
+      maximum-pool-size: 30
+      minimum-idle: 10
+  cloud:
+    nacos:
+      discovery:
+        server‐addr: 127.0.0.1:8848
+logging:
+  level:
+    root: info
+    com.ego.item: debug
+  file:
+    name: d://logs/item.log
+  pattern:
+    #控制台日志输出格式配置，仅对控制台有效
+    console: "%d -%msg%n"
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: /mapper/*.xml
+  type-aliases-package: com.ego.entity
